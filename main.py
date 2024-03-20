@@ -127,6 +127,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             print("Application icon loaded successfully.")
 
     def update_parameter(self, line_edit, name, unit, text):
+        self.original_status_tip = self.ui.pushButton.statusTip()
         if MyMainWindow.is_valid_float(text):
             self.parameters.__setitem__(name, float(text) * unit)
             line_edit.setStyleSheet("")  # Reset stylesheet to default if input is valid
@@ -135,7 +136,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         else:
             line_edit.setStyleSheet("background-color: red;")  # Change background color to red if input is not valid
             self.ui.pushButton.setDisabled(True)
-            self.original_status_tip = self.ui.pushButton.statusTip()
             self.ui.pushButton.setStatusTip("Errors in input fields. Please correct the errors before proceeding.")
             
     def connect_ui_signals(self):
