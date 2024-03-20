@@ -1,0 +1,235 @@
+/* General Styling */
+QWidget {
+    background-color: #333;
+    color: #eee;
+}
+
+QGroupBox {
+    border: 2px solid #555;
+    border-radius: 4px;
+    margin-top: 1ex;
+    padding-top: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 3px;
+}
+
+/* Push Buttons */
+QPushButton {
+    background-color: #555;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+QPushButton:hover {
+    background-color: #666;
+    color: #fff;
+}
+
+/* Radio Buttons */
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+/* Line Edit */
+QLineEdit {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+/* SpinBoxes */
+QSpinBox {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+/* Scroll Bars */
+QScrollBar:vertical {
+    background: #444;
+    width: 10px;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #666;
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QScrollBar::add-line:vertical {
+    background: #444;
+    height: 0px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    background: #444;
+    height: 0px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
+/* List Widget */
+QListWidget {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* Table Widget */
+QTableWidget {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 5px;
+    gridline-color: #555;
+}
+
+QTableWidget::item:selected {
+    background-color: #666;
+}
+
+/* Combo Box */
+QComboBox {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+QComboBox:hover {
+    background-color: #555;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left-width: 1px;
+    border-left-color: #555;
+    border-left-style: solid;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+/* Slider */
+QSlider::groove:horizontal {
+    border: 1px solid #555;
+    height: 8px;
+    background: #444;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+QSlider::handle:horizontal {
+    background: #666;
+    border: 1px solid #555;
+    width: 16px;
+    height: 16px;
+    margin: -4px 0;
+    border-radius: 8px;
+}
+
+QSlider::add-page:horizontal {
+    background: #666;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #444;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+/* Progress Bar */
+QProgressBar {
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #444;
+}
+
+QProgressBar::chunk {
+    background-color: #666;
+    width: 10px;
+    margin: 1px;
+}
+
+/* Tab Widget */
+QTabWidget::pane {
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #444;
+}
+
+QTabBar::tab {
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #555;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    min-width: 8ex;
+    padding: 5px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background-color: #666;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px;
+}
+
+QTabBar::tab:selected:hover {
+    background-color: #777;
+}
+
+QTabBar::tab:top:!selected {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+QTabBar::tab:bottom:!selected {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+QTabBar::tab:top, QTabBar::tab:bottom {
+    min-width: 8ex;
+    padding: 5px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:left, QTabBar::tab:right {
+    min-height: 5ex;
+    padding: 5px;
+    margin-bottom: 2px;
+}
+
+/* Background color for checkboxes */
+QCheckBox {
+    color: #FFFFFF;
+}
