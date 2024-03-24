@@ -14,6 +14,9 @@ from PyQt5.QtWidgets import QMessageBox
 import locale
 
 
+'''
+minWT is incorrect when have ID selected. (does not give UR 1.00 when input the minWT). Investigate.
+'''
 class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
