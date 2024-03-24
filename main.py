@@ -20,6 +20,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         
         self.setupUI_graphics()
         self.init_ui_dict()
+        self.save_original_button_status_tips()
         self.set_input_parameters()
         self.connect_ui_signals()
 
@@ -112,13 +113,18 @@ class MyMainWindow(QtWidgets.QMainWindow):
         else:
             print("Application icon loaded successfully.")
 
+    def save_original_button_status_tips(self):
+        """
+        Updates the parameter value based on the input from the line edit.
+        """
+        self.original_pushButton_status_tip = self.ui.pushButton.statusTip()
+        
     def update_parameter(self, line_edit, name, unit, text):
-        self.original_status_tip = self.ui.pushButton.statusTip()
         if line_edit.hasAcceptableInput() and MyMainWindow.is_valid_float(text):
             self.parameters.__setitem__(name, float(text.replace(',', '.')) * unit)
             line_edit.setStyleSheet("")  # Reset stylesheet to default if input is valid
             self.ui.pushButton.setDisabled(False)
-            self.ui.pushButton.setStatusTip(self.original_status_tip)
+            self.ui.pushButton.setStatusTip(self.original_pushButton_status_tip)
         else:
             line_edit.setStyleSheet("background-color: red;")  # Change background color to red if input is not valid
             self.ui.pushButton.setDisabled(True)

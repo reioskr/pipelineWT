@@ -375,7 +375,7 @@ class BurstCriterion(DNV_F101_Verification):
             NumberOfIter += 1
             if NumberOfIter > 100:
                 print("Minimum required nominal thickness with respect to burst during system pressure test not found; may be very small or very large.")
-                t1 = "-"
+                t1 = float('nan')
                 break
         dnv_min_wt = t1
         self.min_wt_dnv = dnv_min_wt + self.parameters["t_tol"] + t_cor
