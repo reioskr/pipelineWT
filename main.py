@@ -8,6 +8,10 @@ from PyQt5.QtGui import QDoubleValidator, QColor, QPalette, QIcon
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt#, QFile, QTextStream, QSize
 from functools import partial
+from PyQt5.QtWidgets import QMessageBox
+
+
+import locale
 
 
 class MyMainWindow(QtWidgets.QMainWindow):
@@ -18,18 +22,20 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.parameters = parameters
         self.config = config
         
+        self.get_locale_info()
         self.setupUI_graphics()
         self.init_ui_dict()
         self.save_original_button_status_tips()
-        self.set_input_parameters()
+        self.set_init_input_parameters()
         self.connect_ui_signals()
 
     def init_ui_dict(self):
         """
         Initializes a dictionary of line edit UI elements.
-        Key: line edit object name
+        Key: UI line edit object name
         Value:  (1) parameter name in local dictionary
                 (2) unit conversion factor
+                (3) QDoubleValidator object
 
         Returns:
             None
@@ -43,7 +49,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             "le_ref_el_test_pressure": ("ref_el_test_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
             "le_D": ("D", 1, QDoubleValidator(0, float('inf'), 10)),
             "le_t_cor": ("t_cor", 1, QDoubleValidator(0, float('inf'), 10)),
-            "le_t_tol": ("t_tol", 1, QDoubleValidator(0, 100, 10)),
+            "le_t_fab": ("t_fab", 1, QDoubleValidator(0, float('inf'), 10)),
             # "le_t_bendthin": ("t_bendthin", 1, QDoubleValidator(0, float('inf'), 10)),
             "le_alpha_fab": ("alpha_fab", 1, QDoubleValidator(0, 1, 10)),
             "le_alpha_gw": ("alpha_gw", 1, QDoubleValidator(0, 1, 10)),
@@ -89,7 +95,16 @@ class MyMainWindow(QtWidgets.QMainWindow):
             #"cmb_PropagatingBuckling_default_safety_class": ["Propagating buckling", "default", "safety_class"],
         }
     
+    def get_locale_info(self):
+        """
+        Gets the locale information for the application.
 
+        This method retrieves decimal separator convention from Windows locale setting to be used in the UI for the input.
+        """
+        locale.setlocale(locale.LC_ALL, '')
+        self.decimal_point = locale.localeconv()['decimal_point']
+    
+    
     @staticmethod
     def is_valid_float(text):
         """
@@ -121,7 +136,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         
     def update_parameter(self, line_edit, name, unit, text):
         if line_edit.hasAcceptableInput() and MyMainWindow.is_valid_float(text):
-            self.parameters.__setitem__(name, float(text.replace(',', '.')) * unit)
+            #self.parameters.__setitem__(name, float(text.replace(',', '.')) * unit)
             line_edit.setStyleSheet("")  # Reset stylesheet to default if input is valid
             self.ui.pushButton.setDisabled(False)
             self.ui.pushButton.setStatusTip(self.original_pushButton_status_tip)
@@ -165,7 +180,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 parameter_name,
                 unitfix
             )
-            
             line_edit.textChanged.connect(callback)
 
         # DoubleSpinBoxes:
@@ -214,7 +228,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         # To be implemented:
         # For DNV dropdown material selection combo box
         # self.ui.cmb_DNV_material_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_DNV_material_selection.currentText()}))
-        # input validity checks (check wt - t_cor - t_tol - t_bendthin, check if wt is negative etc.)
+        # input validity checks (check wt - t_cor - t_fab - t_bendthin, check if wt is negative etc.)
         
     def calculate_outer_diameter(self):
         if self.parameters["diameter_type"] == "OD [mm]":
@@ -224,8 +238,26 @@ class MyMainWindow(QtWidgets.QMainWindow):
         else:
             raise ValueError("Invalid diameter type")
         
+        
+    def check_t_t_cor_t_fab_t_bendthin(self):
+        t = self.parameters["t"]
+        t_bendthin_mm = self.parameters["t_bendthin"]
+        t_fab_mm = self.parameters["t_fab"]
+        t_cor_mm = self.parameters["t_cor"]
+        if t < t_cor_mm + t_fab_mm + t_bendthin_mm:
+            print("t < t_cor + t_fab + t_bendthin")  
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Warning)
+            msg.setText("Calculated wall thickness is below zero.")
+            msg.setInformativeText("Please verify the input parameters:\n    • t\n    • t_cor\n    • t_fab")
+            msg.setWindowTitle("Warning")
+            msg.setWindowIcon(self.windowIcon())  # Use the same icon as the main app
+            msg.exec_()
+            return False # Return False if the reduced wall thickness is below zero
+        return True # Return True if the reduced wall thickness is above zero
+        
                 
-    def set_input_parameters(self):
+    def set_init_input_parameters(self):
         """
         Sets the input parameters in the UI based on the values stored in the `parameters` and `config` dictionaries.
         This method inserts default parameters to the UI LineEdits and sets default values for comboboxes and checkboxes.
@@ -241,8 +273,14 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 raise KeyError(f"Key '{parameter_name}' not found in parameters")
 
             parameter_value = self.parameters.get(parameter_name, "")
-            line_edit.setText(str(parameter_value / unitfix))  # opposite unit conversion here
+            parameter_value_str = str(parameter_value / unitfix)  # opposite unit conversion here
 
+            # Replace the dot with a comma if windows locale is set to a comma
+            if self.decimal_point == ',':
+                parameter_value_str = parameter_value_str.replace('.', ',')
+
+            line_edit.setText(parameter_value_str)
+            
         # DoubleSpinBoxes:
         for key, value in self.double_spin_box_mapping.items():
             double_spin_box = getattr(self.ui, key)
@@ -314,11 +352,25 @@ class MyMainWindow(QtWidgets.QMainWindow):
             self.parameters[parameter_name] = combo_box.currentText()
 
 
+    def on_button_clicked_general(self):
+        """
+        This method is called when a button is clicked. It performs the following actions:
+        1. Updates the parameters with the values from the line edits (failsafe in case the user doesn't click out of the line edit before clicking the button).
+        2. Calculates the outer diameter based on the selected input diameter type.
+        3. Checks if the reduced wall thickness is above zero.
 
-    def on_button_clicked(self):
-        
+        Returns:
+        bool: True if the reduced wall thickness is above zero, False otherwise.
+        """
         self.read_UI_input_values() # Update the parameters with the values from the line edits (failsafe in case the user doesn't click out of the line edit before clicking the button)
         self.calculate_outer_diameter() # Calculate the outer diameter based on the selected diameter type
+        return self.check_t_t_cor_t_fab_t_bendthin() # Check if the reduced wall thickness is above zero
+        
+
+    def on_button_clicked_calculate_pressure_containment(self):
+        
+        if not self.on_button_clicked_general(): # If returns False, exit the function
+            return
         
         burst_operational = BurstCriterion(self.parameters,self.config, "operational")
         print_dict(self.parameters)
@@ -337,7 +389,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt_dnv:.2f}")
         
         print("Burst Verification Completed")
-        print("OD is:",self.parameters["OD"])
 
 
         
@@ -464,7 +515,7 @@ def main():
     MyMainWindow.set_dark_ui_scheme(app)
     
     window = MyMainWindow()
-    window.ui.pushButton.clicked.connect(window.on_button_clicked)  # Connect the button click event to a method in MyMainWindow
+    window.ui.pushButton.clicked.connect(window.on_button_clicked_calculate_pressure_containment)  # Connect the button click event to a method in MyMainWindow
     window.show()
     sys.exit(app.exec_())
 

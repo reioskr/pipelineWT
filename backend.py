@@ -123,7 +123,7 @@ parameters = {
     "D": 1025.6,              # Diameter (undefined, entry for UI) [mm]
     "t": 28.6,                # Nominal thickness [mm]
     "t_cor": 9,               # Corrosion allowance [mm]
-    "t_tol": 1,               # Fabrication tolerance [mm]
+    "t_fab": 1,               # Fabrication tolerance [mm]
     "t_bendthin": 1,          # Bend thinning [mm]
     #"t_bendthin": self.ui.le_t_bendthin.text(),
     "alpha_fab": 0.85,        
@@ -271,8 +271,8 @@ class DNV_F101_Verification:
         corrosion_enabled = self.parameters["enable_corrosion"]
         t = self.parameters["t"]
         t_cor = self.parameters["t_cor"] if corrosion_enabled else 0
-        t_tol = self.parameters["t_tol"]
-        self.parameters["t_code"] = t - t_tol - t_cor  
+        t_fab = self.parameters["t_fab"]
+        self.parameters["t_code"] = t - t_fab - t_cor  
 
     def gamma_sc(self):  
         """
@@ -379,7 +379,7 @@ class BurstCriterion(DNV_F101_Verification):
                 t1 = float('nan')
                 break
         dnv_min_wt = t1
-        self.min_wt_dnv = dnv_min_wt + self.parameters["t_tol"] + t_cor
+        self.min_wt_dnv = dnv_min_wt + self.parameters["t_fab"] + t_cor
         self.utilisation_dnv = dnv_utility
         
     def dnv_burst_check(self, t: float) -> float:
@@ -463,7 +463,7 @@ class BurstCriterion(DNV_F101_Verification):
 
         min_wt = self.min_wt_burst()
         t_cor = self.parameters["t_cor"] if self.parameters["enable_corrosion"] else 0
-        self.min_wt = min_wt + self.parameters["t_tol"] + t_cor
+        self.min_wt = min_wt + self.parameters["t_fab"] + t_cor
         self.utilisation = min_wt / t_code
         
         #print("min_wt = ", self.min_wt)
