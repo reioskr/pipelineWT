@@ -41,7 +41,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             "le_ref_el_design_pressure": ("ref_el_design_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
             "le_ref_el_min_pressure": ("ref_el_min_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
             "le_ref_el_test_pressure": ("ref_el_test_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
-            "le_D": ("OD", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_D": ("D", 1, QDoubleValidator(0, float('inf'), 10)),
             "le_t_cor": ("t_cor", 1, QDoubleValidator(0, float('inf'), 10)),
             "le_t_tol": ("t_tol", 1, QDoubleValidator(0, 100, 10)),
             # "le_t_bendthin": ("t_bendthin", 1, QDoubleValidator(0, float('inf'), 10)),
@@ -80,7 +80,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         }
 
         self.combo_box_mapping = {
-            "cmb_ID_OD_selection": ["is_OD"],
+            "cmb_ID_OD_selection": ["diameter_type"],
             "cmb_DNV_material_selection": ["DNV_material_selection"],
             
             "cmb_PressureContainment_operational_safety_class": ["Pressure containment", "operational", "safety_class"],
@@ -199,20 +199,32 @@ class MyMainWindow(QtWidgets.QMainWindow):
         # ComboBoxes:
         for key, value in self.combo_box_mapping.items():
             combo_box = getattr(self.ui, key)
-            callback = partial(lambda combo_box, keys, index: self.config[keys[0]][keys[1]].update({keys[2]: combo_box.currentText()}), combo_box, value)
+            callback = partial(
+                lambda combo_box, keys, index: 
+                    self.config.update({keys[0]: combo_box.currentText()})
+                    if len(keys) == 1 # If only one key is in dict, update the root level configuration
+                    else self.config[keys[0]].update({keys[1]: combo_box.currentText()})
+                    if len(keys) == 2 # If two keys are provided (nested dict), update the second level configuration
+                    else self.config[keys[0]][keys[1]].update({keys[2]: combo_box.currentText()}),  # 3rd level nested dict
+                combo_box, 
+                value
+            )
             combo_box.currentIndexChanged.connect(callback)        
 
         # To be implemented:
         # For DNV dropdown material selection combo box
         # self.ui.cmb_DNV_material_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_DNV_material_selection.currentText()}))
-        # For ID or OD selection combo box
-        # self.ui.cmb_ID_OD_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_ID_OD_selection.currentText()}))
-
-        # input validity checks
+        # input validity checks (check wt - t_cor - t_tol - t_bendthin, check if wt is negative etc.)
         
-    def is_it_ID_or_OD(self):
-        pass
+    def calculate_outer_diameter(self):
+        if self.parameters["diameter_type"] == "OD [mm]":
+            self.parameters["OD"] = self.parameters["D"]
+        elif self.parameters["diameter_type"] == "ID [mm]":
+            self.parameters["OD"] = self.parameters["D"] + 2 * self.parameters["t"]
+        else:
+            raise ValueError("Invalid diameter type")
         
+                
     def set_input_parameters(self):
         """
         Sets the input parameters in the UI based on the values stored in the `parameters` and `config` dictionaries.
@@ -306,6 +318,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def on_button_clicked(self):
         
         self.read_UI_input_values() # Update the parameters with the values from the line edits (failsafe in case the user doesn't click out of the line edit before clicking the button)
+        self.calculate_outer_diameter() # Calculate the outer diameter based on the selected diameter type
         
         burst_operational = BurstCriterion(self.parameters,self.config, "operational")
         print_dict(self.parameters)
@@ -324,6 +337,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt_dnv:.2f}")
         
         print("Burst Verification Completed")
+        print("OD is:",self.parameters["OD"])
 
 
         

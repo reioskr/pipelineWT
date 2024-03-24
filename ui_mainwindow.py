@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'c:\Users\Oskar\Desktop\WT_Python\ui_files\ui_mainwindow.ui'
+# Form implementation generated from reading ui file 'c:\github\pipelineWT\ui_files\ui_mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(696, 740)
+        MainWindow.resize(696, 754)
         MainWindow.setAutoFillBackground(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -647,7 +647,7 @@ class Ui_MainWindow(object):
         self.le_t.setObjectName("le_t")
         self.gridLayout_8.addWidget(self.le_t, 1, 1, 1, 1)
         self.cmb_ID_OD_selection = QtWidgets.QComboBox(self.groupBox_4)
-        self.cmb_ID_OD_selection.setEnabled(False)
+        self.cmb_ID_OD_selection.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -1292,7 +1292,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addItem(spacerItem1, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 696, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 696, 26))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setEnabled(True)

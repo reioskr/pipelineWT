@@ -72,7 +72,7 @@ factors = {
 config = {
     "Accuracy": 0.0004,
     "AddMaterialReq": False,
-    "is_OD": True,
+    "diameter_type": "OD [mm]",
     "DNV_material_selection": "DNV",
     
     "Pressure containment": {
@@ -120,6 +120,7 @@ parameters = {
 
     # Dimensions and Tolerances:
     "OD": 1025.6,             # Diameter OD [mm]
+    "D": 1025.6,              # Diameter (undefined, entry for UI) [mm]
     "t": 28.6,                # Nominal thickness [mm]
     "t_cor": 9,               # Corrosion allowance [mm]
     "t_tol": 1,               # Fabrication tolerance [mm]
