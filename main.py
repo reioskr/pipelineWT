@@ -19,11 +19,9 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.config = config
         
         self.setupUI_graphics()
-        #self.setStyleSheet(self.load_stylesheet())
         self.init_ui_dict()
         self.set_input_parameters()
         self.connect_ui_signals()
-        self.set_numeric_validators()
 
     def init_ui_dict(self):
         """
@@ -36,36 +34,36 @@ class MyMainWindow(QtWidgets.QMainWindow):
             None
         """
         self.line_edit_mapping = {
-            "le_P_design": ("P_design", Barg_to_MPa),
-            "le_P_min": ("P_min", Barg_to_MPa),
-            "le_P_test": ("P_test", Barg_to_MPa),
-            "le_ref_el_design_pressure": ("ref_el_design_pressure", 1),
-            "le_ref_el_min_pressure": ("ref_el_min_pressure", 1),
-            "le_ref_el_test_pressure": ("ref_el_test_pressure", 1),
-            "le_D": ("OD", 1),
-            "le_t_cor": ("t_cor", 1),
-            "le_t_tol": ("t_tol", 1),
-            # "le_t_bendthin": ("t_bendthin", 1),
-            "le_alpha_fab": ("alpha_fab", 1),
-            "le_alpha_gw": ("alpha_gw", 1),
-            "le_fo": ("fo", percent_to_fraction),
-            "le_SMYS": ("SMYS", 1),
-            "le_SMTS": ("SMTS", 1),
-            "le_fytemp": ("fytemp", 1),
-            "le_futemp": ("futemp", 1),
-            "le_E": ("E", GPa_to_Pa),
-            "le_nu": ("nu", 1),
-            "le_rho_design": ("rho_design", 1),
-            "le_rho_test": ("rho_test", 1),
-            "le_rho_min": ("rho_min", 1),
-            "le_rho_ext": ("rho_ext", 1),
-            "le_water_depth": ("water_depth", 1),
-            "le_max_elevation": ("max_elevation", 1),
-            "le_min_elevation": ("min_elevation", 1)
+            "le_P_design": ("P_design", Barg_to_MPa, QDoubleValidator(0, float('inf'), 10)),
+            "le_P_min": ("P_min", Barg_to_MPa, QDoubleValidator(0, float('inf'), 10)),
+            "le_P_test": ("P_test", Barg_to_MPa, QDoubleValidator(0, float('inf'), 10)),
+            "le_ref_el_design_pressure": ("ref_el_design_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
+            "le_ref_el_min_pressure": ("ref_el_min_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
+            "le_ref_el_test_pressure": ("ref_el_test_pressure", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
+            "le_D": ("OD", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_t_cor": ("t_cor", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_t_tol": ("t_tol", 1, QDoubleValidator(0, 100, 10)),
+            # "le_t_bendthin": ("t_bendthin", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_alpha_fab": ("alpha_fab", 1, QDoubleValidator(0, 1, 10)),
+            "le_alpha_gw": ("alpha_gw", 1, QDoubleValidator(0, 1, 10)),
+            "le_fo": ("fo", percent_to_fraction, QDoubleValidator(0, 100, 10)),
+            "le_SMYS": ("SMYS", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_SMTS": ("SMTS", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_fytemp": ("fytemp", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_futemp": ("futemp", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_E": ("E", GPa_to_Pa, QDoubleValidator(0, float('inf'), 10)),
+            "le_nu": ("nu", 1, QDoubleValidator(0, 1, 10)),
+            "le_rho_design": ("rho_design", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_rho_test": ("rho_test", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_rho_min": ("rho_min", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_rho_ext": ("rho_ext", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_water_depth": ("water_depth", 1, QDoubleValidator(0, float('inf'), 10)),
+            "le_max_elevation": ("max_elevation", 1, QDoubleValidator(-float('inf'), float('inf'), 10)),
+            "le_min_elevation": ("min_elevation", 1, QDoubleValidator(-float('inf'), float('inf'), 10))
         }
         
         self.double_spin_box_mapping = {
-             "le_t": ("t", 1)
+            "le_t": ("t", 1)
         }
         
         self.checkbox_mapping = {
@@ -89,19 +87,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             #"cmb_Collapse_default_safety_class": ["Collapse", "default", "safety_class"],
             #"cmb_PropagatingBuckling_default_safety_class": ["Propagating buckling", "default", "safety_class"],
         }
-        
-    def set_numeric_validators(self):
-        """
-        Sets a QDoubleValidator for each numeric input field.
-        This method creates a QDoubleValidator object and sets it as the validator for each numeric input field
-        in the line_edit_ui_elements dictionary.
-        """
-        validator = QDoubleValidator()
-        
-        # Set the validator for each numeric input field
-        for key, value in self.line_edit_mapping.items():
-            line_edit = getattr(self.ui, key)
-            line_edit.setValidator(validator)
+    
 
     @staticmethod
     def is_valid_float(text):
@@ -109,7 +95,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         Check if the text represents a valid floating-point number.
         """
         # Remove the first occurrence of '.' and leading '-' if present, then check if the remaining string is a digit
-        cleaned_text = text.replace('.', '', 1).lstrip('-')
+        cleaned_text = text.replace(',', '.').replace('.', '', 1).lstrip('-')
         return cleaned_text.isdigit()
 
     def setupUI_graphics(self):
@@ -128,8 +114,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def update_parameter(self, line_edit, name, unit, text):
         self.original_status_tip = self.ui.pushButton.statusTip()
-        if MyMainWindow.is_valid_float(text):
-            self.parameters.__setitem__(name, float(text) * unit)
+        if line_edit.hasAcceptableInput() and MyMainWindow.is_valid_float(text):
+            self.parameters.__setitem__(name, float(text.replace(',', '.')) * unit)
             line_edit.setStyleSheet("")  # Reset stylesheet to default if input is valid
             self.ui.pushButton.setDisabled(False)
             self.ui.pushButton.setStatusTip(self.original_status_tip)
@@ -164,7 +150,9 @@ class MyMainWindow(QtWidgets.QMainWindow):
             line_edit = getattr(self.ui, key)
             parameter_name = value[0]
             unitfix = value[1]
-            
+            validator = value[2]  # Get the validator from the dictionary
+            line_edit.setValidator(validator) # Set the validator
+    
             callback = partial(
                 lambda line_edit, name, unit, text: self.update_parameter(line_edit, name, unit, text),
                 line_edit,
@@ -173,7 +161,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             )
             
             line_edit.textChanged.connect(callback)
-              
+
         # DoubleSpinBoxes:
         for key, value in self.double_spin_box_mapping.items():
             double_spin_box = getattr(self.ui, key)
@@ -260,7 +248,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             if not isinstance(config_value, bool):
                 raise TypeError(f"Expected a boolean, but got {type(config_value).__name__}")
             checkbox.setChecked(config_value)
-              
+
         # Comboboxes:
         for key, value in self.combo_box_mapping.items():
             combo_box = getattr(self.ui, key)
@@ -284,7 +272,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
             unitfix = value[1]
             text = line_edit.text()
             if MyMainWindow.is_valid_float(text):
-                self.parameters[parameter_name] = float(text) * unitfix
+                self.parameters[parameter_name] = float(text.replace(',', '.')) * unitfix
             else:
                 line_edit.setStyleSheet("background-color: red;")
                 print(f"Invalid input: {text}")
