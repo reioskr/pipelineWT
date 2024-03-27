@@ -1,7 +1,5 @@
 /* Dark Skin Style */
-QMainWindow {
-    background-color: #333333; /* Dark Gray */
-}
+
 
 QWidget#centralwidget {
     background-color: #333333; /* Dark Gray */
@@ -142,8 +140,6 @@ QMenuBar::item:selected {
     background-color: #555555; /* Medium Gray */
 }
 
-QToolBar {
-    background-color: #333333; /* Dark Gray */
-    color: #ffffff; /* White */
-    border: none; /* Remove border */
+QMainWindow {
+    background-color: #f0f0f0; /* Very Light Gray */
 }

@@ -17,6 +17,7 @@ import locale
 '''
 minWT is incorrect when have ID selected. (does not give UR 1.00 when input the minWT). Investigate.
 '''
+
 class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -100,7 +101,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
     
     def get_locale_info(self):
         """
-        Gets the locale information for the application.
+        Gets the locale information0 for the application.
 
         This method retrieves decimal separator convention from Windows locale setting to be used in the UI for the input.
         """
@@ -138,8 +139,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.original_pushButton_status_tip = self.ui.pushButton.statusTip()
         
     def update_parameter(self, line_edit, name, unit, text):
-        if line_edit.hasAcceptableInput() and MyMainWindow.is_valid_float(text):
-            #self.parameters.__setitem__(name, float(text.replace(',', '.')) * unit)
+        if line_edit.hasAcceptableInput() and self.is_valid_float(text):
             line_edit.setStyleSheet("")  # Reset stylesheet to default if input is valid
             self.ui.pushButton.setDisabled(False)
             self.ui.pushButton.setStatusTip(self.original_pushButton_status_tip)
@@ -231,7 +231,6 @@ class MyMainWindow(QtWidgets.QMainWindow):
         # To be implemented:
         # For DNV dropdown material selection combo box
         # self.ui.cmb_DNV_material_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_DNV_material_selection.currentText()}))
-        # input validity checks (check wt - t_cor - t_fab - t_bendthin, check if wt is negative etc.)
         
     def calculate_outer_diameter(self):
         if self.parameters["diameter_type"] == "OD [mm]":
@@ -357,8 +356,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def on_button_clicked_general(self):
         """
-        This method is called when a button is clicked. It performs the following actions:
-        1. Updates the parameters with the values from the line edits (failsafe in case the user doesn't click out of the line edit before clicking the button).
+        This method is called when any button is clicked. It performs the following actions:
+        1. Updates the parameters with the values from the line edits.
         2. Calculates the outer diameter based on the selected input diameter type.
         3. Checks if the reduced wall thickness is above zero.
 
@@ -374,153 +373,115 @@ class MyMainWindow(QtWidgets.QMainWindow):
         
         if not self.on_button_clicked_general(): # If returns False, exit the function
             return
-        
+        self.parameters
         burst_operational = BurstCriterion(self.parameters,self.config, "operational")
-        print_dict(self.parameters)
-        print_dict(burst_operational.parameters)
+        #print(self.parameters)
+
         burst_operational.run()
-        #self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.utilisation:.3f}</b>")
-        #self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.min_wt:.2f}")
-        self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.utilisation_dnv:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.min_wt_dnv:.2f}")
-        
+        print(burst_operational.parameters)
+        self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.parameters["Utility"]:.3f}</b>")
+        self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.parameters["min_wt"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_fy.setText(f"{burst_operational.parameters["fy"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_fu.setText(f"{burst_operational.parameters["fu"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_t.setText(f"{burst_operational.parameters["t_code"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_pb.setText(f"{burst_operational.parameters["p_b"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_gammaM.setText(f"{burst_operational.parameters["gamma_m"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_gammaSC.setText(f"{burst_operational.parameters["gamma_sc"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_Pld.setText(f"{burst_operational.parameters["Pld"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_Plx.setText(f"{burst_operational.parameters["Pl_i/t"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_Pe.setText(f"{burst_operational.parameters["Pe"]:.2f}")
+        self.ui.lbl_PressureContainment_operational_PlxPe.setText(f"{burst_operational.parameters["Pl_i/t-Pe"]:.2f}")
+
+
+
         burst_test = BurstCriterion(self.parameters,self.config, "system test")
         burst_test.run()
-        #self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.utilisation:.3f}</b>")
-        #self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt:.2f}")
-        self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.utilisation_dnv:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt_dnv:.2f}")
-        
+        print(burst_test.parameters)
+        self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.parameters["Utility"]:.3f}</b>")
+        self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.parameters["min_wt"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_fy.setText(f"{burst_test.parameters["fy"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_fu.setText(f"{burst_test.parameters["fu"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_t.setText(f"{burst_test.parameters["t_code"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_pb.setText(f"{burst_test.parameters["p_b"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_gammaM.setText(f"{burst_test.parameters["gamma_m"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_gammaSC.setText(f"{burst_test.parameters["gamma_sc"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Pld.setText(f"{burst_test.parameters["Pld"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Plx.setText(f"{burst_test.parameters["Pl_i/t"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Pe.setText(f"{burst_test.parameters["Pe"]:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_PlxPe.setText(f"{burst_test.parameters["Pl_i/t-Pe"]:.2f}")
+
         print("Burst Verification Completed")
 
 
         
     @classmethod
     def set_dark_ui_scheme(cls, app):
-        # Apply dark mode stylesheet
+
         app.setStyle('Fusion')
-
-        dark_mode_stylesheet = """
-        /* Base background color for all widgets */
-        QWidget {
-            background-color: #333333;
-            color: #FFFFFF;
-        }
-
-        /* Background color for input fields */
-        QLineEdit {
-            background-color: #555555;
-        }
         
-        QSpinBox {
-            background-color: #555555; 
-        }
+        # Select the desired stylesheet
+        stylesheet_path = "stylesheets/stylesheet_light.qss"
+        #stylesheet_path = "stylesheets/stylesheet_dark.qss"
 
-        QDoubleSpinBox {
-            background-color: #555555; 
-        }
-
-        /* Background color for buttons */
-        QPushButton {
-            background-color: #555555;
-            border: none;
-            padding: 5px 10px;
-        }
-
-        /* Background color for combobox */
-        QComboBox {
-            background-color: #555555;
-            color: #FFFFFF;
-            selection-background-color: #666666;
-        }
-
-        /* Background color for checkboxes */
-        QCheckBox {
-            color: #FFFFFF;
-        }
-
-        /* Background color for radio buttons */
-        QRadioButton {
-            color: #FFFFFF;
-        }
-
-        /* Background color for labels */
-        QLabel {
-            color: #FFFFFF;
-        }
-
-        /* Background color for scrollbars */
-        QScrollBar {
-            background-color: #555555;
-        }
-
-        /* Background color for tab widget */
-        QTabWidget::pane {
-            background-color: #555555;
-        }
-
-        /* Background color for tab bar */
-        QTabBar::tab {
-            background-color: #666666;
-            color: #FFFFFF;
-        }
-
-        /* Background color for selected tab */
-        QTabBar::tab:selected {
-            background-color: #777777;
-        }
-
-        /* Background color for disabled widgets */
-        QWidget[enabled="false"] {
-            background-color: #444444;
-            color: #888888;
-        }
+        file = QtCore.QFile(stylesheet_path)
+        if file.open(QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Text):
+            stream = QtCore.QTextStream(file)
+            stylesheet = stream.readAll()
+            print("Stylesheet loaded successfully.")
+        else:
+            print("Failed to load stylesheet.")
         
-        /* Push Buttons */
-        QPushButton {
-            background-color: #555;
-            color: #eee;
-            border: 1px solid #555;
-            border-radius: 5px;
-            padding: 5px 10px;
-        }
+        # Apply stylesheet
+        app.setStyleSheet(stylesheet)
 
-        QPushButton:hover {
-            background-color: #666;
-            color: #fff;
-        }
-
-        """
-
-        # Apply dark mode stylesheet
-        app.setStyleSheet(dark_mode_stylesheet)
-        # Set dark mode color palette
-        dark_palette = QPalette()
-        dark_palette.setColor(QPalette.Window, QColor(53, 53, 53))
-        dark_palette.setColor(QPalette.WindowText, Qt.white)
-        dark_palette.setColor(QPalette.Base, QColor(70,70,70))
-        dark_palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
-        dark_palette.setColor(QPalette.ToolTipBase, Qt.white)
-        dark_palette.setColor(QPalette.ToolTipText, Qt.white)
-        dark_palette.setColor(QPalette.Text, Qt.white)
-        dark_palette.setColor(QPalette.Button, QColor(53, 53, 53))
-        dark_palette.setColor(QPalette.ButtonText, Qt.white)
-        dark_palette.setColor(QPalette.BrightText, Qt.red)
-        dark_palette.setColor(QPalette.Link, QColor(42, 130, 218))
-        dark_palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
-        dark_palette.setColor(QPalette.HighlightedText, Qt.black)
-        app.setPalette(dark_palette)
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
 
-    MyMainWindow.set_dark_ui_scheme(app)
+
     
     window = MyMainWindow()
     window.ui.pushButton.clicked.connect(window.on_button_clicked_calculate_pressure_containment)  # Connect the button click event to a method in MyMainWindow
+    MyMainWindow.set_dark_ui_scheme(app)
     window.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()
+
+
+"""
+def save_to_excel(data, file_path):
+    with pd.ExcelWriter(file_path) as writer:
+        df_factors = pd.DataFrame(data["factors"])
+        df_factors.to_excel(writer, sheet_name="factors", index=False)
+        
+        df_config = pd.DataFrame(data["config"])
+        df_config.to_excel(writer, sheet_name="config", index=False)
+        
+        df_parameters = pd.DataFrame(data["parameters"])
+        df_parameters.to_excel(writer, sheet_name="parameters", index=False)
+
+def read_from_excel(file_path):
+    with pd.ExcelFile(file_path) as xls:
+        data = {}
+        data["factors"] = pd.read_excel(xls, sheet_name="factors").to_dict(orient='records')
+        data["config"] = pd.read_excel(xls, sheet_name="config").to_dict(orient='records')
+        data["parameters"] = pd.read_excel(xls, sheet_name="parameters").to_dict(orient='records')
+        return data
+
+# Example usage:
+data = {
+    "factors": factors,
+    "config": config,
+    "parameters": parameters
+}
+
+save_to_excel(data, 'data.xlsx')
+
+data_from_excel = read_from_excel('data.xlsx')
+factors_from_excel = data_from_excel["factors"]
+config_from_excel = data_from_excel["config"]
+parameters_from_excel = data_from_excel["parameters"]
+"""

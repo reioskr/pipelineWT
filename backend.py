@@ -10,14 +10,11 @@ Notes:
 t_fab not considered in propagating bucling in DNV check?
 Burst check, system test, derating has no impact on results? Check with DNV excel
 Test Pmin and Ptest significance in Excel for bursting check
-handle comma inputs and error when set the SMYS to 4.5MPa, the minWT comes back as a string
-input validity checks
-UI minimum vertical is off and the remove the dragging lines
 '''
 def print_dict(dictionary):
-    rounded_values = {key: round(value, 5) if isinstance(value, (int, float)) else value for key, value in dictionary.items()}
-    print(json.dumps(rounded_values, indent=4, sort_keys=False))
-            
+    dictionary = {key: round(value, 5) if isinstance(value, (int, float)) else value for key, value in dictionary.items()}
+    print(json.dumps(dictionary, indent=4, sort_keys=False))
+      
 
 Barg_to_Pa = 1e5
 Pa_to_Barg = 1e-5
@@ -151,41 +148,6 @@ parameters = {
 
     # Other Parameters:
 }
-"""
-def save_to_excel(data, file_path):
-    with pd.ExcelWriter(file_path) as writer:
-        df_factors = pd.DataFrame(data["factors"])
-        df_factors.to_excel(writer, sheet_name="factors", index=False)
-        
-        df_config = pd.DataFrame(data["config"])
-        df_config.to_excel(writer, sheet_name="config", index=False)
-        
-        df_parameters = pd.DataFrame(data["parameters"])
-        df_parameters.to_excel(writer, sheet_name="parameters", index=False)
-
-def read_from_excel(file_path):
-    with pd.ExcelFile(file_path) as xls:
-        data = {}
-        data["factors"] = pd.read_excel(xls, sheet_name="factors").to_dict(orient='records')
-        data["config"] = pd.read_excel(xls, sheet_name="config").to_dict(orient='records')
-        data["parameters"] = pd.read_excel(xls, sheet_name="parameters").to_dict(orient='records')
-        return data
-
-# Example usage:
-data = {
-    "factors": factors,
-    "config": config,
-    "parameters": parameters
-}
-
-save_to_excel(data, 'data.xlsx')
-
-data_from_excel = read_from_excel('data.xlsx')
-factors_from_excel = data_from_excel["factors"]
-config_from_excel = data_from_excel["config"]
-parameters_from_excel = data_from_excel["parameters"]
-"""
-
 
 class DNV_F101_Verification:
     
@@ -252,7 +214,7 @@ class DNV_F101_Verification:
         Args:
             depth (float): Depth [m].
         """
-        self.parameters["Pl_i/t"] = self.local_pressure(self.parameters["Pressure"], self.parameters["rho_int"], depth)
+        self.parameters["Pld"] = self.local_pressure(self.parameters["P_design"], self.parameters["rho_int"], depth)
         
     def external_pressure(self, depth: float) -> float: 
         """
@@ -341,14 +303,15 @@ class BurstCriterion(DNV_F101_Verification):
         self.limit_state = "Pressure containment"
         self.condition = condition
         super().__init__(par, conf)
-        
-    def min_wt_burst(self) -> float:
+
         """
+    def min_wt_burst(self) -> float:
+        """        """
         Returns minimum allowable WT wrt. pressure containment check.
 
         Returns:
             float: Minimum WT for Burst resistance [mm] (exclusive of tolerances, corrosion allowance).
-        """
+        """        """
         
         OD = self.parameters["OD"]
         Pe = self.parameters["Pe"]
@@ -358,31 +321,34 @@ class BurstCriterion(DNV_F101_Verification):
         gamma_sc = self.parameters["gamma_sc"]
         P = Pi - Pe
         return (math.sqrt(3) * OD * gamma_m * gamma_sc * P) / (4 * fcb + math.sqrt(3) * gamma_m * gamma_sc * P)
-
-    def dnv_excel_burst(self, t_cor: float):
+        """
+        
+    def calculate_burst_utility_and_min_wt(self, t_cor: float):
         """
         Calculate pressure containment resistance and minimum wt (Excel).
         """
         t1 = self.parameters["t_code"]
-        p_b = self.dnv_burst_check(t1)
-        dnv_utility = self.dnv_utility(p_b)
+        p_b = self.burst_check(t1)
+        dnv_utility = self.burst_utility(p_b)
         utility_burst = dnv_utility
+        
+        self.parameters["p_b"] = p_b
+        self.parameters["Utility"] = dnv_utility
 
         NumberOfIter = 1
         while abs(utility_burst - 1) > self.config["Accuracy"]:
             t1 = t1 * utility_burst ** 0.25
-            p_b = self.dnv_burst_check(t1)
-            utility_burst = self.dnv_utility(p_b)
+            p_b = self.burst_check(t1)
+            utility_burst = self.burst_utility(p_b)
             NumberOfIter += 1
             if NumberOfIter > 100:
-                print("Minimum required nominal thickness with respect to burst during system pressure test not found; may be very small or very large.")
+                print("Minimum required nominal thickness with respect to burst not found; may be very small or very large.")
                 t1 = float('nan')
                 break
-        dnv_min_wt = t1
-        self.min_wt_dnv = dnv_min_wt + self.parameters["t_fab"] + t_cor
-        self.utilisation_dnv = dnv_utility
+        min_wt = t1
+        self.parameters["min_wt"] = min_wt + self.parameters["t_fab"] + t_cor
         
-    def dnv_burst_check(self, t: float) -> float:
+    def burst_check(self, t: float) -> float:
         """
         Calculate pressure containment resistance (Excel).
         """
@@ -394,7 +360,7 @@ class BurstCriterion(DNV_F101_Verification):
         #self.parameters["dnv_p_b"] = p_b
         return p_b
     
-    def dnv_utility(self, p_b: float) -> float:
+    def burst_utility(self, p_b: float) -> float:
         """
         Calculate pressure containment utilisation (Excel).
         """
@@ -402,10 +368,8 @@ class BurstCriterion(DNV_F101_Verification):
         Pe = self.parameters["Pe"]
         gamma_m = self.parameters["gamma_m"]
         gamma_sc = self.parameters["gamma_sc"]
-        #p_b = self.parameters["p_b"]
         
         utility = (Pl - Pe) * gamma_m * gamma_sc / p_b
-        #self.parameters["dnv_utility"] = utility
         return utility
 
     def set_parameters_burst(self):
@@ -438,48 +402,40 @@ class BurstCriterion(DNV_F101_Verification):
         """
         self.set_parameters_burst()
 
-        PdD = self.parameters["P_design"]
         gamma_inc = self.parameters["gamma_inc"]
-        
-        if self.condition == "system test":
-            self.parameters["Pressure"] = PdD * gamma_inc * 1.05  # Test pressure [MPa]
-        else:  # Operational
-            self.parameters["Pressure"] = PdD * gamma_inc         # Incidental pressure [MPa]
-
-        t_code = self.parameters["t_code"]
-        gamma_m = self.parameters["gamma_m"]
-        gamma_sc = self.parameters["gamma_sc"]
         
         self.calculate_fcb()  # Calculate fcb based on condition
 
         depth_for_Pe = self.parameters["water_depth"] + self.parameters["min_elevation"]
         depth_for_Pi = self.parameters["water_depth"] + self.parameters["ref_el_pressure"]
 
-        self.external_pressure(depth_for_Pe) # External pressure [MPa]
-        self.internal_pressure(depth_for_Pi) # Internal pressure [MPa]
+        self.external_pressure(depth_for_Pe) # Local external pressure [MPa]
+        self.internal_pressure(depth_for_Pi) # Local internal pressure [MPa]
         
+        Pld = self.parameters["Pld"] # Local internal pressure [MPa]
+
+        if self.condition == "system test":
+            self.parameters["Pl_i/t"] = Pld * gamma_inc * 1.05  # Test pressure [MPa]
+        else:  # Operational
+            self.parameters["Pl_i/t"] = Pld * gamma_inc         # Incidental pressure [MPa]
+
         Pe = self.parameters["Pe"]       # Local external pressure [MPa]
-        Pl = self.parameters["Pl_i/t"]   # Local internal (incidental, Pli / test, Plt) pressure [MPa]
+        Pi = self.parameters["Pl_i/t"]   # Local internal (incidental, Pli / test, Plt) pressure [MPa]
+        self.parameters["Pl_i/t-Pe"] = Pi - Pe     # Pressure difference [MPa]
 
-        min_wt = self.min_wt_burst()
         t_cor = self.parameters["t_cor"] if self.parameters["enable_corrosion"] else 0
-        self.min_wt = min_wt + self.parameters["t_fab"] + t_cor
-        self.utilisation = min_wt / t_code
         
-        #print("min_wt = ", self.min_wt)
-        #print("UR = ", self.utilisation)
+        #min_wt = self.min_wt_burst()
+        #self.min_wt = min_wt + self.parameters["t_fab"] + self.parameters["t_code"]
+        #self.utilisation = min_wt / self.parameters["t_code"]
         
-        self.dnv_excel_burst(t_cor)
-        print("DNV min_wt  = ", self.min_wt_dnv)
-        print("DNV utility  = ", self.utilisation_dnv)
+        self.calculate_burst_utility_and_min_wt(t_cor)
+        print("min_wt  = ", self.parameters["min_wt"])
+        print("Utility  = ", self.parameters["Utility"])
         
-        #self.print_all_variables()
-
 
 burst_operational = BurstCriterion(parameters, config, "operational")
 burst_operational.run()
-
-
 
 burst_test = BurstCriterion(parameters, config, "system test")
 burst_test.run()
@@ -489,5 +445,6 @@ burst_test.run()
 
 #print_dict(burst_test.parameters)
 #print_dict(burst_operational.config)
-import os
-print(os.getcwd())
+
+#print(burst_operational.parameters)
+#print_dict(burst_operational.parameters)
