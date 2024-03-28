@@ -375,9 +375,8 @@ class MyMainWindow(QtWidgets.QMainWindow):
         
         if not self.on_button_clicked_general(): # If returns False, exit the function
             return
-        self.parameters
+
         burst_operational = BurstCriterion(self.parameters,self.config, "operational")
-        #print(self.parameters)
 
         burst_operational.run()
         self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.Utility:.3f}</b>")

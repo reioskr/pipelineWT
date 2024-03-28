@@ -14,7 +14,8 @@ Test Pmin and Ptest significance in Excel for bursting check
 def print_dict(dictionary):
     dictionary = {key: round(value, 5) if isinstance(value, (int, float)) else value for key, value in dictionary.items()}
     print(json.dumps(dictionary, indent=4, sort_keys=False))
-      
+    with open('Analysis.json', 'w') as f:
+        json.dump(dictionary, f, indent=4, sort_keys=False) 
 
 Barg_to_Pa = 1e5
 Pa_to_Barg = 1e-5
@@ -317,10 +318,13 @@ class DNV_F101_Verification:
         return factors["gamma_M"].get(safety_class, factors["gamma_M"]["default"])
     
     def set_results_output_dict(self, output_dict):
-        if self.limit_state not in self.parameters or not isinstance(self.parameters[self.limit_state], dict):
-            self.parameters[self.limit_state] = {}
-            
-        self.parameters[self.limit_state][self.condition] = output_dict
+        if "ANALYSIS" not in self.parameters:
+            self.parameters["ANALYSIS"] = {}
+
+        if self.limit_state not in self.parameters["ANALYSIS"] or not isinstance(self.parameters["ANALYSIS"][self.limit_state], dict):
+            self.parameters["ANALYSIS"][self.limit_state] = {}
+
+        self.parameters["ANALYSIS"][self.limit_state][self.condition] = output_dict
         print_dict(self.parameters)
         
 class BurstCriterion(DNV_F101_Verification):
