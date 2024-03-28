@@ -288,6 +288,7 @@
   ('stringprep',
    'C:\\Users\\Toomas\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\stringprep.py',
    'PYMODULE'),
+  ('styles', 'C:\\github\\pipelineWT\\styles.py', 'PYMODULE'),
   ('subprocess',
    'C:\\Users\\Toomas\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\subprocess.py',
    'PYMODULE'),

@@ -1,5 +1,7 @@
 import os
 import sys
+from styles import *
+
 from PyQt5 import QtWidgets
 from ui_mainwindow import Ui_MainWindow
 from backend import * 
@@ -80,13 +82,13 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.checkbox_mapping = {
             "cb_AddMaterialReq": ("AddMaterialReq",),
             "cb_PressureContainment_operational_enable_corrosion": ("Pressure containment", "operational", "enable_corrosion"),
-            "cb_PressureContainment_operational_enable_derating": ("Pressure containment", "operational", "enable_derating"),
+            "cb_PressureContainment_operational_enable_derating": ("Pressure containment", "operational", "derating_enabled"),
             "cb_PressureContainment_systemtest_enable_corrosion": ("Pressure containment", "system test", "enable_corrosion"),
-            "cb_PressureContainment_systemtest_enable_derating": ("Pressure containment", "system test", "enable_derating")
+            "cb_PressureContainment_systemtest_enable_derating": ("Pressure containment", "system test", "derating_enabled")
             #"cb_Collapse_default_enable_corrosion": ("Collapse", "default", "enable_corrosion"),
-            #"cb_Collapse_default_enable_derating": ("Collapse", "default", "enable_derating"),
+            #"cb_Collapse_default_derating_enabled": ("Collapse", "default", "derating_enabled"),
             #"cb_PropagatingBuckling_default_enable_corrosion": ("Propagating buckling", "default", "enable_corrosion"),
-            #"cb_PropagatingBuckling_default_enable_derating": ("Propagating buckling", "default", "enable_derating")
+            #"cb_PropagatingBuckling_default_derating_enabled": ("Propagating buckling", "default", "derating_enabled")
         }
 
         self.combo_box_mapping = {
@@ -378,37 +380,34 @@ class MyMainWindow(QtWidgets.QMainWindow):
         #print(self.parameters)
 
         burst_operational.run()
-        print(burst_operational.parameters)
-        self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.parameters["Utility"]:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.parameters["min_wt"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_fy.setText(f"{burst_operational.parameters["fy"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_fu.setText(f"{burst_operational.parameters["fu"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_t.setText(f"{burst_operational.parameters["t_code"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_pb.setText(f"{burst_operational.parameters["p_b"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_gammaM.setText(f"{burst_operational.parameters["gamma_m"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_gammaSC.setText(f"{burst_operational.parameters["gamma_sc"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_Pld.setText(f"{burst_operational.parameters["Pld"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_Plx.setText(f"{burst_operational.parameters["Pl_i/t"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_Pe.setText(f"{burst_operational.parameters["Pe"]:.2f}")
-        self.ui.lbl_PressureContainment_operational_PlxPe.setText(f"{burst_operational.parameters["Pl_i/t-Pe"]:.2f}")
-
+        self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.Utility:.3f}</b>")
+        self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.min_wt:.2f}")
+        self.ui.lbl_PressureContainment_operational_fy.setText(f"{burst_operational.fy:.2f}")
+        self.ui.lbl_PressureContainment_operational_fu.setText(f"{burst_operational.fu:.2f}")
+        self.ui.lbl_PressureContainment_operational_t.setText(f"{burst_operational.t_code:.2f}")
+        self.ui.lbl_PressureContainment_operational_pb.setText(f"{burst_operational.p_b:.2f}")
+        self.ui.lbl_PressureContainment_operational_gammaM.setText(f"{burst_operational.gamma_m:.2f}")
+        self.ui.lbl_PressureContainment_operational_gammaSC.setText(f"{burst_operational.gamma_sc:.2f}")
+        self.ui.lbl_PressureContainment_operational_Pld.setText(f"{burst_operational.Pld:.2f}")
+        self.ui.lbl_PressureContainment_operational_Plx.setText(f"{burst_operational.Pl_it:.2f}")
+        self.ui.lbl_PressureContainment_operational_Pe.setText(f"{burst_operational.Pe:.2f}")
+        self.ui.lbl_PressureContainment_operational_PlxPe.setText(f"{burst_operational.Pl_it_Pe:.2f}")
 
 
         burst_test = BurstCriterion(self.parameters,self.config, "system test")
         burst_test.run()
-        print(burst_test.parameters)
-        self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.parameters["Utility"]:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.parameters["min_wt"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_fy.setText(f"{burst_test.parameters["fy"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_fu.setText(f"{burst_test.parameters["fu"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_t.setText(f"{burst_test.parameters["t_code"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_pb.setText(f"{burst_test.parameters["p_b"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_gammaM.setText(f"{burst_test.parameters["gamma_m"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_gammaSC.setText(f"{burst_test.parameters["gamma_sc"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Pld.setText(f"{burst_test.parameters["Pld"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Plx.setText(f"{burst_test.parameters["Pl_i/t"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Pe.setText(f"{burst_test.parameters["Pe"]:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_PlxPe.setText(f"{burst_test.parameters["Pl_i/t-Pe"]:.2f}")
+        self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.Utility:.3f}</b>")
+        self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_fy.setText(f"{burst_test.fy:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_fu.setText(f"{burst_test.fu:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_t.setText(f"{burst_test.t_code:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_pb.setText(f"{burst_test.p_b:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_gammaM.setText(f"{burst_test.gamma_m:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_gammaSC.setText(f"{burst_test.gamma_sc:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Pld.setText(f"{burst_test.Pld:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Plx.setText(f"{burst_test.Pl_it:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_Pe.setText(f"{burst_test.Pe:.2f}")
+        self.ui.lbl_PressureContainment_systemtest_PlxPe.setText(f"{burst_test.Pl_it_Pe:.2f}")
 
         print("Burst Verification Completed")
 
@@ -420,18 +419,9 @@ class MyMainWindow(QtWidgets.QMainWindow):
         app.setStyle('Fusion')
         
         # Select the desired stylesheet
-        stylesheet_path = "stylesheets/stylesheet_light.qss"
-        #stylesheet_path = "stylesheets/stylesheet_dark.qss"
+        stylesheet = stylesheet_light
+        stylesheet = stylesheet_dark
 
-        file = QtCore.QFile(stylesheet_path)
-        if file.open(QtCore.QIODevice.ReadOnly | QtCore.QIODevice.Text):
-            stream = QtCore.QTextStream(file)
-            stylesheet = stream.readAll()
-            print("Stylesheet loaded successfully.")
-        else:
-            print("Failed to load stylesheet.")
-        
-        # Apply stylesheet
         app.setStyleSheet(stylesheet)
 
 
