@@ -14,8 +14,8 @@ Test Pmin and Ptest significance in Excel for bursting check
 def print_dict(dictionary):
     dictionary = {key: round(value, 5) if isinstance(value, (int, float)) else value for key, value in dictionary.items()}
     print(json.dumps(dictionary, indent=4, sort_keys=False))
-    with open('Analysis.json', 'w') as f:
-        json.dump(dictionary, f, indent=4, sort_keys=False) 
+#    with open('Analysis.json', 'w') as f:
+#        json.dump(dictionary, f, indent=4, sort_keys=False) 
 
 Barg_to_Pa = 1e5
 Pa_to_Barg = 1e-5
@@ -172,10 +172,10 @@ class DNV_F101_Verification:
         self.SMTS = self.parameters["SMTS"]
         
         self.OD = self.parameters["OD"]
-        
+
+        self.safety_class = self.config[self.limit_state][self.condition]["safety_class"]
         self.corrosion_enabled = self.config[self.limit_state][self.condition]["enable_corrosion"]
         self.derating_enabled = self.config[self.limit_state][self.condition]["derating_enabled"]
-        self.safety_class = self.config[self.limit_state][self.condition]["safety_class"]
 
 
     def set_parameters(self):
@@ -325,8 +325,10 @@ class DNV_F101_Verification:
             self.parameters["ANALYSIS"][self.limit_state] = {}
 
         self.parameters["ANALYSIS"][self.limit_state][self.condition] = output_dict
+
         print_dict(self.parameters)
         
+
 class BurstCriterion(DNV_F101_Verification):
     def __init__(self, par, conf, condition):
         self.limit_state = "Pressure containment"
@@ -427,6 +429,9 @@ class BurstCriterion(DNV_F101_Verification):
         burts_output = {
         "limit_state": self.limit_state,
         "condition": self.condition,
+        "safety_class": self.safety_class,
+        "corrosion_enabled": self.corrosion_enabled,
+        "derating_enabled": self.derating_enabled,
         "alpha_U": self.alpha_U,
         "fytemp": self.fytemp,
         "futemp": self.futemp,
@@ -450,6 +455,7 @@ class BurstCriterion(DNV_F101_Verification):
     }
         self.set_results_output_dict(burts_output)
         
+
 
         
     def run(self):

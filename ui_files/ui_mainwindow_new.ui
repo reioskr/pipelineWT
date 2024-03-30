@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1170</width>
+    <width>1169</width>
     <height>837</height>
    </rect>
   </property>
@@ -97,8 +97,10 @@
          </property>
          <property name="font">
           <font>
+           <family>Segoe UI</family>
            <pointsize>9</pointsize>
            <weight>75</weight>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
          </property>
@@ -3060,7 +3062,11 @@
         <spacer name="verticalSpacer_2">
          <property name="font">
           <font>
+           <family>Segoe UI</family>
            <pointsize>9</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
           </font>
          </property>
          <property name="orientation">
@@ -3482,7 +3488,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1170</width>
+     <width>1169</width>
      <height>26</height>
     </rect>
    </property>
@@ -3493,16 +3499,30 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_2"/>
     <addaction name="actionOpen_2"/>
+    <addaction name="actionSave_2"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QMenu" name="menuTheme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="actionThemeLight"/>
+     <addaction name="actionThemeDark"/>
+    </widget>
+    <addaction name="menuTheme"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSettings"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="windowTitle">
     <string>toolBar</string>
@@ -3513,7 +3533,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionNew"/>
    <addaction name="actionOpen"/>
    <addaction name="actionSave"/>
   </widget>
@@ -3535,17 +3554,17 @@
     <string>Save</string>
    </property>
   </action>
-  <action name="actionNew_2">
+  <action name="actionSave_2">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>Save</string>
    </property>
   </action>
   <action name="actionOpen_2">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Open</string>
@@ -3553,10 +3572,20 @@
   </action>
   <action name="actionExit">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionThemeLight">
+   <property name="text">
+    <string>Light</string>
+   </property>
+  </action>
+  <action name="actionThemeDark">
+   <property name="text">
+    <string>Dark</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,7 @@
 # styles.py
 
 
-stylesheet_dark = """
+dark = """
 /* Dark Skin Style */
 QMainWindow {
     background-color: #333333; /* Dark Gray */
@@ -154,7 +154,7 @@ QToolBar {
 """
 
 
-stylesheet_light = """
+light = """
 /* Light Skin Style */
 QMainWindow {
     background-color: #f0f0f0; /* Very Light Gray */

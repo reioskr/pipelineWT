@@ -35,6 +35,9 @@
             "operational": {
                 "limit_state": "Pressure containment",
                 "condition": "operational",
+                "safety_class": "High",
+                "corrosion_enabled": true,
+                "derating_enabled": true,
                 "alpha_U": 0.96,
                 "fytemp": 9,
                 "futemp": 9,
@@ -59,6 +62,9 @@
             "system test": {
                 "limit_state": "Pressure containment",
                 "condition": "system test",
+                "safety_class": "System test",
+                "corrosion_enabled": true,
+                "derating_enabled": true,
                 "alpha_U": 0.96,
                 "fytemp": 9,
                 "futemp": 9,

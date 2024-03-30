@@ -10,10 +10,11 @@ from PyQt5.QtGui import QDoubleValidator, QColor, QPalette, QIcon
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt#, QFile, QTextStream, QSize
 from functools import partial
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 
 import locale
+import configparser
 
 
 '''
@@ -23,6 +24,9 @@ minWT is incorrect when have ID selected. (does not give UR 1.00 when input the 
 class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
+        
+        self.load_settings()
+        
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.parameters = parameters
@@ -110,7 +114,19 @@ class MyMainWindow(QtWidgets.QMainWindow):
         locale.setlocale(locale.LC_ALL, '')
         self.decimal_point = locale.localeconv()['decimal_point']
     
-    
+    @classmethod
+    def load_settings(cls):
+        """
+        Reads the settings from the settings.ini file.
+        """
+        cls.settings = configparser.ConfigParser()
+        cls.settings.read('settings.ini')
+
+    @classmethod
+    def save_settings(cls):
+        with open('settings.ini', 'w') as configfile:
+            cls.settings.write(configfile)
+        
     @staticmethod
     def is_valid_float(text):
         """
@@ -230,9 +246,20 @@ class MyMainWindow(QtWidgets.QMainWindow):
             )
             combo_box.currentIndexChanged.connect(callback)        
 
+        # Menu actions:
+        self.ui.actionOpen.triggered.connect(self.open_file_dialog)
+        self.ui.actionSave.triggered.connect(self.save_file_dialog)
+
+        self.ui.actionExit.triggered.connect(self.close)
+
+        self.ui.actionThemeDark.triggered.connect(lambda: (MyMainWindow.set_settings('DEFAULT', 'Theme', 'dark'), self.update_ui_theme('dark')))
+        self.ui.actionThemeLight.triggered.connect(lambda: (MyMainWindow.set_settings('DEFAULT', 'Theme', 'light'), self.update_ui_theme('light')))
+
+        
         # To be implemented:
         # For DNV dropdown material selection combo box
         # self.ui.cmb_DNV_material_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_DNV_material_selection.currentText()}))
+        
         
     def calculate_outer_diameter(self):
         if self.parameters["diameter_type"] == "OD [mm]":
@@ -410,29 +437,65 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
         print("Burst Verification Completed")
 
-
-        
     @classmethod
-    def set_dark_ui_scheme(cls, app):
-
+    def set_ui_scheme(cls, app):
         app.setStyle('Fusion')
         
-        # Select the desired stylesheet
-        stylesheet = stylesheet_light
-        stylesheet = stylesheet_dark
+        # Select the desired stylesheet        
+        theme = cls.settings.get('DEFAULT', 'Theme', fallback='light')  # 'light' is the default theme
+        cls.update_ui_theme(app, theme)
+        
+    @classmethod
+    def set_settings(cls, section, option, value):
+        cls.settings.set(section, option, value)
+        cls.save_settings()
 
-        app.setStyleSheet(stylesheet)
+    def update_ui_theme(app, theme):
+        """MyMainWindow.set_ui_scheme
+        Updates the UI theme based on the selected theme from the UI.
+        """
+        
+        if theme == 'dark':
+            app.setStyleSheet(dark)
+        else:
+            app.setStyleSheet(light)
+            
+    def open_file_dialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open Case", "", "JSON Files (*.json)", options=options)
+        if file_name:
+            with open(file_name, 'r') as f:
+                self.parameters = json.load(f)
+                print("Loaded: ", file_name)
+                self.set_init_input_parameters()
+                #self.get_results_output_dict()
 
+    def save_file_dialog(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Case", "", "JSON Files (*.json)", options=options)
+        if file_name:
+            with open(file_name, 'w') as f:
+                json.dump(self.parameters, f, indent=4, sort_keys=False) 
+                print("Saved: ", file_name)
 
-
+    #def get_results_output_dict(self):
+    #   if "ANALYSIS" in self.parameters:
+    #        output_dict = self.parameters["ANALYSIS"][self.limit_state][self.condition]
+    #       print("output_dict = ", output_dict)
+         
+        
 def main():
     app = QtWidgets.QApplication(sys.argv)
 
 
     
     window = MyMainWindow()
+    #app.aboutToQuit.connect(MyMainWindow.save_settings)  # Save the settings when the application is about to quit
+
     window.ui.pushButton.clicked.connect(window.on_button_clicked_calculate_pressure_containment)  # Connect the button click event to a method in MyMainWindow
-    MyMainWindow.set_dark_ui_scheme(app)
+    MyMainWindow.set_ui_scheme(app)
     window.show()
     sys.exit(app.exec_())
 
