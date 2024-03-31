@@ -154,6 +154,7 @@ cython_debug/
 # Additonal
 *.json
 *.ini
+settings.ini
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
