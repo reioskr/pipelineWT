@@ -484,18 +484,16 @@ class BurstCriterion(DNV_F101_Verification):
 
         t_cor = self.t_cor
         
-        #min_wt = self.min_wt_burst()
-        #self.min_wt = min_wt + self.parameters["t_fab"] + self.parameters["t_code"]
-        #self.utilisation = min_wt / self.parameters["t_code"]
-        
         self.calculate_burst_utility_and_min_wt(t_cor)
         print("min_wt  = ", self.min_wt)
         print("Utility  = ", self.Utility)
         self.write_output_dict()
-        
 
-burst_operational = BurstCriterion(parameters, config, "operational")
-burst_operational.run()
 
-burst_test = BurstCriterion(parameters, config, "system test")
-burst_test.run()
+if __name__ == "__main__":
+    # This code is only executed when the module is run directly
+    burst_operational = BurstCriterion(parameters, config, "operational")
+    burst_operational.run()
+
+    burst_test = BurstCriterion(parameters, config, "system test")
+    burst_test.run()
