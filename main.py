@@ -1,24 +1,25 @@
-import os
 import sys
-from styles import *
-
-from PyQt5 import QtWidgets
-from ui_mainwindow import Ui_MainWindow
-from backend import * 
-
-from PyQt5.QtGui import QDoubleValidator, QIcon, QPixmap # QColor, QPalette
-from PyQt5 import QtCore
-from PyQt5.QtCore import QByteArray #Qt, QSize, QFile, QTextStream
-from functools import partial
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
-
-from resources.icons.icon_base64 import icon_base64
-
 import locale
 import configparser
 
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QByteArray #Qt, QSize, QFile, QTextStream
+from PyQt5.QtGui import QDoubleValidator, QIcon, QPixmap # QColor, QPalette
+from PyQt5.QtWidgets import QMessageBox, QFileDialog
+
+from functools import partial
+
+from ui_mainwindow import Ui_MainWindow # UI class
+from backend import *                   # DNV_F101_Verification
+
+from resources.icons.icon_base64 import icon_base64
+from stylesheets.styles import light, dark
+
+
+
 
 '''
+OREI notes:
 minWT is incorrect when have ID selected. (does not give UR 1.00 when input the minWT). Investigate.
 '''
 
@@ -518,39 +519,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-"""
-def save_to_excel(data, file_path):
-    with pd.ExcelWriter(file_path) as writer:
-        df_factors = pd.DataFrame(data["factors"])
-        df_factors.to_excel(writer, sheet_name="factors", index=False)
-        
-        df_config = pd.DataFrame(data["config"])
-        df_config.to_excel(writer, sheet_name="config", index=False)
-        
-        df_parameters = pd.DataFrame(data["parameters"])
-        df_parameters.to_excel(writer, sheet_name="parameters", index=False)
-
-def read_from_excel(file_path):
-    with pd.ExcelFile(file_path) as xls:
-        data = {}
-        data["factors"] = pd.read_excel(xls, sheet_name="factors").to_dict(orient='records')
-        data["config"] = pd.read_excel(xls, sheet_name="config").to_dict(orient='records')
-        data["parameters"] = pd.read_excel(xls, sheet_name="parameters").to_dict(orient='records')
-        return data
-
-# Example usage:
-data = {
-    "factors": factors,
-    "config": config,
-    "parameters": parameters
-}
-
-save_to_excel(data, 'data.xlsx')
-
-data_from_excel = read_from_excel('data.xlsx')
-factors_from_excel = data_from_excel["factors"]
-config_from_excel = data_from_excel["config"]
-parameters_from_excel = data_from_excel["parameters"]
-"""
