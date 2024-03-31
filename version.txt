@@ -17,12 +17,12 @@ VSVersionInfo(
                     [
                         StringStruct(u'CompanyName', u'Ramboll'),
                         StringStruct(u'FileDescription', u'Pipeline Wall Thickness Design'),
-                        StringStruct(u'FileVersion', u'0.0.0.1-alpha'),
+                        StringStruct(u'FileVersion', u'0.0.0.2-alpha'),
                         StringStruct(u'InternalName', u'pipedesign'),
                         StringStruct(u'LegalCopyright', u''),
                         StringStruct(u'OriginalFilename', u'PipelineWallThickness.exe'),
                         StringStruct(u'ProductName', u'Subsea Pipeline Wall Thickness Designer'),
-                        StringStruct(u'ProductVersion', u'0.0.0.1-alpha')
+                        StringStruct(u'ProductVersion', u'0.0.0.2-alpha')
                     ]
                 )
             ]
