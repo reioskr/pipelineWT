@@ -436,13 +436,13 @@ class MyMainWindow(QtWidgets.QMainWindow):
         
         if self.on_button_clicked_general(): # Proceed only if returns true
             burst_operational = BurstCriterion(self.parameters, self.config, "operational")
-            self.update_ui(burst_operational, "operational")
+            self.run_and_update_ui(burst_operational, "operational")
 
             burst_test = BurstCriterion(self.parameters, self.config, "system test")
-            self.update_ui(burst_test, "systemtest")
+            self.run_and_update_ui(burst_test, "systemtest")
             print("Burst Verification Completed")
 
-    def update_ui(self, burst, prefix):
+    def run_and_update_ui(self, burst, prefix):
         burst.run()
         getattr(self.ui, f'lbl_PressureContainment_{prefix}_UR').setText(f"<b>{burst.Utility:.3f}</b>")
         getattr(self.ui, f'lbl_PressureContainment_{prefix}_minWT').setText(f"{burst.min_wt:.2f}")
