@@ -67,6 +67,10 @@ QComboBox::drop-down {
     background-color: transparent;
 }
 
+QComboBox QAbstractItemView {
+    background-color: #333333;
+}
+
 QPushButton {
     background-color: #555555; /* Dark Gray */
     border: 2px solid #ffffff; /* White */
@@ -151,6 +155,15 @@ QToolBar {
     color: #ffffff; /* White */
     border: none; /* Remove border */
 }
+
+QToolBar QToolButton{
+    color: #ffffff;
+}
+
+QToolButton:hover{
+    background-color: #555555;
+}
+
 """
 
 
@@ -217,6 +230,10 @@ QComboBox:focus {
 QComboBox::drop-down {
     border: none;
     background-color: transparent;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #f0f0f0;
 }
 
 QPushButton {
@@ -301,5 +318,13 @@ QToolBar {
     background-color: #f0f0f0; /* Light Gray */
     color: #333333; /* Dark Gray */
     border: none; /* Remove border */
+}
+
+QToolBar QToolButton{
+    color: #333333;
+}
+
+QToolButton:hover{
+    background-color: #cccccc;
 }
 """
