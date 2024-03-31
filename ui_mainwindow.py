@@ -2147,7 +2147,7 @@ class Ui_MainWindow(object):
         self.lbl_PressureContainment_gammaM.setText(_translate("MainWindow", "<html><head/><body><p>γ<span style=\" vertical-align:sub;\">M</span></p></body></html>"))
         self.cb_PressureContainment_operational_enable_derating.setStatusTip(_translate("MainWindow", "Include material temperature derating effects f,temp in Operational condition"))
         self.label_49.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Input:</span></p></body></html>"))
-        self.pushButton_2.setStatusTip(_translate("MainWindow", "Verify Pressure containment"))
+        self.pushButton_2.setStatusTip(_translate("MainWindow", "Create Report"))
         self.pushButton_2.setText(_translate("MainWindow", "Report"))
         self.lbl_PressureContainment_systemtest_minWT.setStatusTip(_translate("MainWindow", "Utilisation for Pressure Containment in System test"))
         self.lbl_PressureContainment_operational_minWT.setStatusTip(_translate("MainWindow", "Utilisation for Pressure Containment in Operational conditions"))

@@ -3274,7 +3274,7 @@
           <cursorShape>ArrowCursor</cursorShape>
          </property>
          <property name="statusTip">
-          <string>Verify Pressure containment</string>
+          <string>Create Report</string>
          </property>
          <property name="text">
           <string>Report</string>
