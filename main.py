@@ -9,8 +9,8 @@ from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from functools import partial
 
-from ui_mainwindow import Ui_MainWindow # UI class
-from backend import *                   # DNV_F101_Verification
+from ui_files.ui_mainwindow import Ui_MainWindow # UI class
+from backend import *                            # DNV_F101_Verification
 
 from resources.icons.icon_base64 import icon_base64
 from stylesheets.styles import light, dark
