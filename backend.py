@@ -2,7 +2,6 @@
 
 import math
 import json
-#import pandas as pd
 
 
 '''
@@ -10,12 +9,11 @@ Notes:
 t_fab not considered in propagating bucling in DNV check?
 Burst check, system test, derating has no impact on results? Check with DNV excel
 Test Pmin and Ptest significance in Excel for bursting check
+Check and remove sections with "not used yet"
 '''
 def print_dict(dictionary):
     dictionary = {key: round(value, 5) if isinstance(value, (int, float)) else value for key, value in dictionary.items()}
     print(json.dumps(dictionary, indent=4, sort_keys=False))
-#    with open('Analysis.json', 'w') as f:
-#        json.dump(dictionary, f, indent=4, sort_keys=False) 
 
 Barg_to_Pa = 1e5
 Pa_to_Barg = 1e-5
@@ -109,7 +107,7 @@ parameters = {
     
     # Pressures and Reference elevations for pressure levels:
     "P_design": 8.4,                    # Design Pressure [MPa]
-    "P_min": 0,                         # Minimum Pressure [MPa] (not used ye)
+    "P_min": 0,                         # Minimum Pressure [MPa] (not used yet)
     "P_test": 0,                        # Test Pressure [MPa]    (not used yet)
 
     "ref_el_design_pressure": 0,   # Elevation relative to Design Pressure [m]
@@ -185,7 +183,7 @@ class DNV_F101_Verification:
         self.gamma_m()   # Assign limit state factor, gamma_m.
         self.alpha_u()   # Assign alpha_U.
         self.set_fytemp_futemp() # Assign fytemp and futemp based if derating is enabled.
-        self.set_t_cor() # Assign fytemp and futemp based if derating is enabled.
+        self.set_t_cor() # Assign t_cor based if corrosion is enabled.
         
         self.code_wt()   # Calculate code verification wall thickness considering corrosion, fabrication tolerances.
         self.calculate_fy_fu() # Calculate yield strength (fy) and tensile strength (fu) considering derating.
