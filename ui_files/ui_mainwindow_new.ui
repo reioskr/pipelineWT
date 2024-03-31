@@ -2585,7 +2585,7 @@
         </widget>
        </item>
        <item row="19" column="4">
-        <widget class="QLabel" name="lbl_UR_PressureContainment_test">
+        <widget class="QLabel" name="lbl_PressureContainment_systemtest_UR">
          <property name="font">
           <font>
            <family>Segoe UI</family>
@@ -3081,7 +3081,7 @@
         </spacer>
        </item>
        <item row="19" column="2" colspan="2">
-        <widget class="QLabel" name="lbl_UR_PressureContainment_operation">
+        <widget class="QLabel" name="lbl_PressureContainment_operational_UR">
          <property name="font">
           <font>
            <family>Segoe UI</family>
@@ -3357,7 +3357,7 @@
         </widget>
        </item>
        <item row="20" column="4">
-        <widget class="QLabel" name="lbl_minWT_PressureContainment_test">
+        <widget class="QLabel" name="lbl_PressureContainment_systemtest_minWT">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -3385,7 +3385,7 @@
         </widget>
        </item>
        <item row="20" column="2">
-        <widget class="QLabel" name="lbl_minWT_PressureContainment_operation">
+        <widget class="QLabel" name="lbl_PressureContainment_operational_minWT">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -3499,9 +3499,9 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen_2"/>
-    <addaction name="actionSave_2"/>
-    <addaction name="actionExit"/>
+    <addaction name="actionMenuOpen"/>
+    <addaction name="actionMenuSave"/>
+    <addaction name="actionMenuExit"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
@@ -3554,7 +3554,7 @@
     <string>Save</string>
    </property>
   </action>
-  <action name="actionSave_2">
+  <action name="actionMenuSave">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -3562,7 +3562,7 @@
     <string>Save</string>
    </property>
   </action>
-  <action name="actionOpen_2">
+  <action name="actionMenuOpen">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -3570,7 +3570,7 @@
     <string>Open</string>
    </property>
   </action>
-  <action name="actionExit">
+  <action name="actionMenuExit">
    <property name="enabled">
     <bool>true</bool>
    </property>

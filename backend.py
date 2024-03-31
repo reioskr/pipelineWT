@@ -425,7 +425,6 @@ class BurstCriterion(DNV_F101_Verification):
         self.fcb = fcb
         
     def write_output_dict(self):
-        
         burts_output = {
         "limit_state": self.limit_state,
         "condition": self.condition,

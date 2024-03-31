@@ -247,19 +247,21 @@ class MyMainWindow(QtWidgets.QMainWindow):
             combo_box.currentIndexChanged.connect(callback)        
 
         # Menu actions:
+        self.ui.actionMenuOpen.triggered.connect(self.open_file_dialog)
+        self.ui.actionMenuSave.triggered.connect(self.save_file_dialog)
+        self.ui.actionMenuExit.triggered.connect(self.close)
+
+        # Toolbar actions:
         self.ui.actionOpen.triggered.connect(self.open_file_dialog)
         self.ui.actionSave.triggered.connect(self.save_file_dialog)
 
-        self.ui.actionExit.triggered.connect(self.close)
 
         self.ui.actionThemeDark.triggered.connect(lambda: (MyMainWindow.set_settings('DEFAULT', 'Theme', 'dark'), self.update_ui_theme('dark')))
         self.ui.actionThemeLight.triggered.connect(lambda: (MyMainWindow.set_settings('DEFAULT', 'Theme', 'light'), self.update_ui_theme('light')))
-
         
         # To be implemented:
         # For DNV dropdown material selection combo box
         # self.ui.cmb_DNV_material_selection.currentIndexChanged.connect(lambda index: self.ACTION: self.ui.cmb_DNV_material_selection.currentText()}))
-        
         
     def calculate_outer_diameter(self):
         if self.parameters["diameter_type"] == "OD [mm]":
@@ -270,24 +272,42 @@ class MyMainWindow(QtWidgets.QMainWindow):
             raise ValueError("Invalid diameter type")
         
         
-    def check_t_t_cor_t_fab_t_bendthin(self):
+    def check_OD_t_t_cor_t_fab_t_bendthin(self):
+        OD = self.parameters["OD"]
         t = self.parameters["t"]
         t_bendthin_mm = self.parameters["t_bendthin"]
         t_fab_mm = self.parameters["t_fab"]
         t_cor_mm = self.parameters["t_cor"]
-        if t < t_cor_mm + t_fab_mm + t_bendthin_mm:
-            print("t < t_cor + t_fab + t_bendthin")  
-            msg = QMessageBox()
-            msg.setIcon(QMessageBox.Warning)
-            msg.setText("Calculated wall thickness is below zero.")
-            msg.setInformativeText("Please verify the input parameters:\n    • t\n    • t_cor\n    • t_fab")
-            msg.setWindowTitle("Warning")
-            msg.setWindowIcon(self.windowIcon())  # Use the same icon as the main app
-            msg.exec_()
-            return False # Return False if the reduced wall thickness is below zero
-        return True # Return True if the reduced wall thickness is above zero
         
+        if t < t_cor_mm + t_fab_mm + t_bendthin_mm:
+            return self.show_warning("Calculated wall thickness is below zero.", "Please verify the input parameters:\n    • t\n    • t_cor\n    • t_fab")
+
+        if OD < 2 * (t + t_fab_mm):
+            return self.show_warning("Calculated ID is below zero.", "Please verify the input parameters:\n    • OD or ID\n    • t\n    • t_fab")        
+        
+        return True # Return True if checks are OK
                 
+    def show_warning(self, message, informative_text):
+        """
+        Display a warning message box with the given message and informative text.
+
+        Args:
+            message (str): The main message to be displayed in the warning box.
+            informative_text (str): Additional text providing more information about the warning.
+
+        Returns:
+            bool: False indicating that the warning was shown.
+        """
+        print(message)
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText(message)
+        msg.setInformativeText(informative_text)
+        msg.setWindowTitle("Warning")
+        msg.setWindowIcon(self.windowIcon())  # Use the same icon as the main app
+        msg.exec_()
+        return False
+         
     def set_init_input_parameters(self):
         """
         Sets the input parameters in the UI based on the values stored in the `parameters` and `config` dictionaries.
@@ -311,7 +331,7 @@ class MyMainWindow(QtWidgets.QMainWindow):
                 parameter_value_str = parameter_value_str.replace('.', ',')
 
             line_edit.setText(parameter_value_str)
-            
+        
         # DoubleSpinBoxes:
         for key, value in self.double_spin_box_mapping.items():
             double_spin_box = getattr(self.ui, key)
@@ -395,47 +415,34 @@ class MyMainWindow(QtWidgets.QMainWindow):
         """
         self.read_UI_input_values() # Update the parameters with the values from the line edits (failsafe in case the user doesn't click out of the line edit before clicking the button)
         self.calculate_outer_diameter() # Calculate the outer diameter based on the selected diameter type
-        return self.check_t_t_cor_t_fab_t_bendthin() # Check if the reduced wall thickness is above zero
+        return self.check_OD_t_t_cor_t_fab_t_bendthin() # Check if the reduced wall thickness is above zero
         
 
     def on_button_clicked_calculate_pressure_containment(self):
         
-        if not self.on_button_clicked_general(): # If returns False, exit the function
-            return
+        if self.on_button_clicked_general(): # Proceed only if returns true
+            burst_operational = BurstCriterion(self.parameters, self.config, "operational")
+            self.update_ui(burst_operational, "operational")
 
-        burst_operational = BurstCriterion(self.parameters,self.config, "operational")
+            burst_test = BurstCriterion(self.parameters, self.config, "system test")
+            self.update_ui(burst_test, "systemtest")
+            print("Burst Verification Completed")
 
-        burst_operational.run()
-        self.ui.lbl_UR_PressureContainment_operation.setText(f"<b>{burst_operational.Utility:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_operation.setText(f"{burst_operational.min_wt:.2f}")
-        self.ui.lbl_PressureContainment_operational_fy.setText(f"{burst_operational.fy:.2f}")
-        self.ui.lbl_PressureContainment_operational_fu.setText(f"{burst_operational.fu:.2f}")
-        self.ui.lbl_PressureContainment_operational_t.setText(f"{burst_operational.t_code:.2f}")
-        self.ui.lbl_PressureContainment_operational_pb.setText(f"{burst_operational.p_b:.2f}")
-        self.ui.lbl_PressureContainment_operational_gammaM.setText(f"{burst_operational.gamma_m:.2f}")
-        self.ui.lbl_PressureContainment_operational_gammaSC.setText(f"{burst_operational.gamma_sc:.2f}")
-        self.ui.lbl_PressureContainment_operational_Pld.setText(f"{burst_operational.Pld:.2f}")
-        self.ui.lbl_PressureContainment_operational_Plx.setText(f"{burst_operational.Pl_it:.2f}")
-        self.ui.lbl_PressureContainment_operational_Pe.setText(f"{burst_operational.Pe:.2f}")
-        self.ui.lbl_PressureContainment_operational_PlxPe.setText(f"{burst_operational.Pl_it_Pe:.2f}")
+    def update_ui(self, burst, prefix):
+        burst.run()
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_UR').setText(f"<b>{burst.Utility:.3f}</b>")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_minWT').setText(f"{burst.min_wt:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_fy').setText(f"{burst.fy:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_fu').setText(f"{burst.fu:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_t').setText(f"{burst.t_code:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_pb').setText(f"{burst.p_b:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_gammaM').setText(f"{burst.gamma_m:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_gammaSC').setText(f"{burst.gamma_sc:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_Pld').setText(f"{burst.Pld:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_Plx').setText(f"{burst.Pl_it:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_Pe').setText(f"{burst.Pe:.2f}")
+        getattr(self.ui, f'lbl_PressureContainment_{prefix}_PlxPe').setText(f"{burst.Pl_it_Pe:.2f}")
 
-
-        burst_test = BurstCriterion(self.parameters,self.config, "system test")
-        burst_test.run()
-        self.ui.lbl_UR_PressureContainment_test.setText(f"<b>{burst_test.Utility:.3f}</b>")
-        self.ui.lbl_minWT_PressureContainment_test.setText(f"{burst_test.min_wt:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_fy.setText(f"{burst_test.fy:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_fu.setText(f"{burst_test.fu:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_t.setText(f"{burst_test.t_code:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_pb.setText(f"{burst_test.p_b:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_gammaM.setText(f"{burst_test.gamma_m:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_gammaSC.setText(f"{burst_test.gamma_sc:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Pld.setText(f"{burst_test.Pld:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Plx.setText(f"{burst_test.Pl_it:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_Pe.setText(f"{burst_test.Pe:.2f}")
-        self.ui.lbl_PressureContainment_systemtest_PlxPe.setText(f"{burst_test.Pl_it_Pe:.2f}")
-
-        print("Burst Verification Completed")
 
     @classmethod
     def set_ui_scheme(cls, app):
@@ -466,33 +473,30 @@ class MyMainWindow(QtWidgets.QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open Case", "", "JSON Files (*.json)", options=options)
         if file_name:
             with open(file_name, 'r') as f:
-                self.parameters = json.load(f)
+                data = json.load(f)
+                self.parameters = data.get('parameters', {})
+                self.config = data.get('config', {})
                 print("Loaded: ", file_name)
                 self.set_init_input_parameters()
-                #self.get_results_output_dict()
+                self.on_button_clicked_calculate_pressure_containment() # Rerun the calculations with imported input (alternatively could load the results from json)
 
+                
     def save_file_dialog(self):
         options = QFileDialog.Options()
         options |= QFileDialog.ReadOnly
         file_name, _ = QFileDialog.getSaveFileName(self, "Save Case", "", "JSON Files (*.json)", options=options)
         if file_name:
             with open(file_name, 'w') as f:
-                json.dump(self.parameters, f, indent=4, sort_keys=False) 
-                print("Saved: ", file_name)
-
-    #def get_results_output_dict(self):
-    #   if "ANALYSIS" in self.parameters:
-    #        output_dict = self.parameters["ANALYSIS"][self.limit_state][self.condition]
-    #       print("output_dict = ", output_dict)
-         
+                data = {'parameters': self.parameters, 'config': self.config}
+                json.dump(data, f, indent=4, sort_keys=False) 
+                print("Saved: ", file_name)                
+                    
+                    
         
 def main():
     app = QtWidgets.QApplication(sys.argv)
 
-
-    
     window = MyMainWindow()
-    #app.aboutToQuit.connect(MyMainWindow.save_settings)  # Save the settings when the application is about to quit
 
     window.ui.pushButton.clicked.connect(window.on_button_clicked_calculate_pressure_containment)  # Connect the button click event to a method in MyMainWindow
     MyMainWindow.set_ui_scheme(app)
