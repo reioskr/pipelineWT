@@ -6,12 +6,13 @@ from PyQt5 import QtWidgets
 from ui_mainwindow import Ui_MainWindow
 from backend import * 
 
-from PyQt5.QtGui import QDoubleValidator, QColor, QPalette, QIcon
+from PyQt5.QtGui import QDoubleValidator, QIcon, QPixmap # QColor, QPalette
 from PyQt5 import QtCore
-from PyQt5.QtCore import Qt#, QFile, QTextStream, QSize
+from PyQt5.QtCore import QByteArray #Qt, QSize, QFile, QTextStream
 from functools import partial
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
+from resources.icons.icon_base64 import icon_base64
 
 import locale
 import configparser
@@ -137,12 +138,24 @@ class MyMainWindow(QtWidgets.QMainWindow):
         return cleaned_text.isdigit()
 
     def setupUI_graphics(self):
-        # Add icon
-        icon_name = "resources/icons/32px.png"
-        self.app_icon = QIcon(icon_name)
-        self.app_icon.addFile("resources/icons/16px.png")  # Add 16x16 icon size
-        self.app_icon.addFile("resources/icons/32px.png")  # Add 32x32 icon size
-        self.setWindowIcon(QIcon(icon_name))
+        """
+        Sets up the graphics user interface.
+
+        It seems that the pyinstaller does not consider the external files for the taskbar/window icon.
+        Hence this function adds an icon to the application window using a base64 string representation of the icon file.
+        """
+        # Convert the base64 string back to bytes
+        icon_data = QByteArray.fromBase64(icon_base64.encode('utf-8'))
+
+        # Create a QPixmap object from the bytes
+        pixmap = QPixmap()
+        pixmap.loadFromData(icon_data, 'ICO')
+
+        # Create a QIcon object from the QPixmap object
+        self.app_icon = QIcon(pixmap)
+
+        # Set the window icon
+        self.setWindowIcon(self.app_icon)
         
         # Check if the icon is loaded successfully
         if self.app_icon.isNull():
