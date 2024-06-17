@@ -7,7 +7,7 @@ import json
 '''
 Notes:
 t_fab not considered in propagating bucling in DNV check?
-Burst check, system test, derating has no impact on results? Check with DNV excel
+Burst check, system test, derating has no impact on results?
 Test Pmin and Ptest significance in Excel for bursting check
 Check and remove sections with "not used yet"
 '''
